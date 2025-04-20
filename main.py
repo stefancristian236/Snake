@@ -38,12 +38,14 @@ def show_score(choice, color, font, size):
     score_font = pygame.font.SysFont(font, size)
     score_surface = score_font.render('Score : ' + str(score), True, color)
     score_rect = score_surface.get_rect()
+    score_rect.midtop = (windwidth // 2, 10)
     game_window.blit(score_surface, score_rect)
 
 def game_over():
     my_font = pygame.font.SysFont('times new roman', 50)
     game_over_surface = my_font.render('Score : ' + str(score), True, red)
     game_over_rect = game_over_surface.get_rect()
+    game_over_rect.center = (windwidth // 2, windheight // 2)
     game_window.blit(game_over_surface, game_over_rect)
     pygame.display.flip()
     time.sleep(2)
@@ -127,7 +129,7 @@ while True:
         fruit_pos = [random.randrange(1, (windwidth//10)) * 10, random.randrange(1,(windheight//10)) * 10]
 
     fruit_spawn = True
-    game_window.fill(blue)
+    game_window.fill(black)
 
     for index, pos in enumerate(snake_body):
         if index == 0:  
