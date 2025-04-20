@@ -160,6 +160,7 @@ while running:
 
         snake_prev_head = list(snake_pos)
 
+
         if direction == 'UP':
             snake_pos[1] -= snake_velocity
         if direction == 'DOWN':
@@ -168,6 +169,8 @@ while running:
             snake_pos[0] -= snake_velocity
         if direction == 'RIGHT':
             snake_pos[0] += snake_velocity
+
+        #initiate wrapping when the snake touches the the border instead of losing
 
         if snake_pos[0] < 0:
             snake_pos[0] = windwidth - grid_size
@@ -179,6 +182,8 @@ while running:
             snake_pos[1] = 0
 
         snake_body.insert(0, list(snake_pos))
+
+        #updated the check collision so that it ranged based rather than exact perfect collision
 
         if check_collision(snake_pos, fruit_pos):
             score += 10
@@ -201,6 +206,8 @@ while running:
             pass
 
         game_window.fill(black)
+
+        #added the snake textures based on the position of the snake and length
 
         for index, pos in enumerate(snake_body):
             if index == 0:
