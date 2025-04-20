@@ -69,7 +69,7 @@ tail_textures = {
 }
 
 body_textures = {
-     'HORIZONTAL': pygame.image.load('Graphics/body_horizontal.png'),
+    'HORIZONTAL': pygame.image.load('Graphics/body_horizontal.png'),
     'VERTICAL': pygame.image.load('Graphics/body_vertical.png'),
     'TOPLEFT': pygame.image.load('Graphics/body_topleft.png'),
     'TOPRIGHT': pygame.image.load('Graphics/body_topright.png'),
@@ -77,22 +77,39 @@ body_textures = {
     'BOTTOMRIGHT': pygame.image.load('Graphics/body_bottomright.png')
 }
 
-while True:
+running = True  
+pause = False  # Variable to track the pause state
+
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()  
+            running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                change_to = 'UP'
-            if event.key == pygame.K_DOWN:
-                change_to = 'DOWN'
-            if event.key == pygame.K_LEFT:
-                change_to = 'LEFT'
-            if event.key == pygame.K_RIGHT:
-                change_to = 'RIGHT'
+            if event.key == pygame.K_ESCAPE:  # Toggle pause when ESC is pressed
+                pause = not pause  # Toggle the pause state
 
+            if not pause:  # Only allow movement keys when not paused
+                if event.key == pygame.K_UP:
+                    change_to = 'UP'
+                if event.key == pygame.K_DOWN:
+                    change_to = 'DOWN'
+                if event.key == pygame.K_LEFT:
+                    change_to = 'LEFT'
+                if event.key == pygame.K_RIGHT:
+                    change_to = 'RIGHT'
+
+    if pause:
+        # Display a "Paused" message
+        pause_font = pygame.font.SysFont('times new roman', 50)
+        pause_surface = pause_font.render('Game Paused', True, white)
+        pause_rect = pause_surface.get_rect()
+        pause_rect.center = (windwidth // 2, windheight // 2)
+        game_window.blit(pause_surface, pause_rect)
+        pygame.display.update()
+        continue  # Skip the rest of the game logic
+
+    # Game logic (only runs when not paused)
     if change_to == 'UP' and direction != 'DOWN':
         direction = 'UP'
     if change_to == 'DOWN' and direction != 'UP':
@@ -107,37 +124,34 @@ while True:
     if direction == 'DOWN':
         snake_pos[1] += snake_velocity
     if direction == 'LEFT':
-        snake_pos[0] -= snake_velocity 
+        snake_pos[0] -= snake_velocity
     if direction == 'RIGHT':
         snake_pos[0] += snake_velocity
 
     snake_body.insert(0, list(snake_pos))
-    
-    
+
     if snake_pos[0] == fruit_pos[0] and snake_pos[1] == fruit_pos[1]:
         score += 10
         fruit_spawn = False
-        growth_counter += 5  
+        growth_counter += 5
 
-    
     if growth_counter > 0:
         growth_counter -= 1
     else:
         snake_body.pop()
 
     if not fruit_spawn:
-        fruit_pos = [random.randrange(1, (windwidth//10)) * 10, random.randrange(1,(windheight//10)) * 10]
+        fruit_pos = [random.randrange(1, (windwidth // 10)) * 10, random.randrange(1, (windheight // 10)) * 10]
 
     fruit_spawn = True
     game_window.fill(black)
 
     for index, pos in enumerate(snake_body):
-        if index == 0:  
+        if index == 0:
             game_window.blit(head_textures[direction], (pos[0], pos[1]))
-        elif index == len(snake_body) - 1: 
-            
-            tail_direction = 'UP'  
-            if snake_body[-2][0] < pos[0]:  
+        elif index == len(snake_body) - 1:
+            tail_direction = 'UP'
+            if snake_body[-2][0] < pos[0]:
                 tail_direction = 'RIGHT'
             elif snake_body[-2][0] > pos[0]:
                 tail_direction = 'LEFT'
@@ -146,22 +160,21 @@ while True:
             elif snake_body[-2][1] > pos[1]:
                 tail_direction = 'UP'
             game_window.blit(tail_textures[tail_direction], (pos[0], pos[1]))
-        else:  
-        
+        else:
             prev_segment = snake_body[index - 1]
             next_segment = snake_body[index + 1]
 
-            if prev_segment[0] == next_segment[0]:  
+            if prev_segment[0] == next_segment[0]:
                 game_window.blit(body_textures['VERTICAL'], (pos[0], pos[1]))
             elif prev_segment[1] == next_segment[1]:
                 game_window.blit(body_textures['HORIZONTAL'], (pos[0], pos[1]))
-            elif prev_segment[0] < pos[0] and next_segment[1] < pos[1] or prev_segment[1] < pos[1] and next_segment[0] < pos[0]:  
+            elif prev_segment[0] < pos[0] and next_segment[1] < pos[1] or prev_segment[1] < pos[1] and next_segment[0] < pos[0]:
                 game_window.blit(body_textures['TOPLEFT'], (pos[0], pos[1]))
-            elif prev_segment[0] > pos[0] and next_segment[1] < pos[1] or prev_segment[1] < pos[1] and next_segment[0] > pos[0]:  
+            elif prev_segment[0] > pos[0] and next_segment[1] < pos[1] or prev_segment[1] < pos[1] and next_segment[0] > pos[0]:
                 game_window.blit(body_textures['TOPRIGHT'], (pos[0], pos[1]))
-            elif prev_segment[0] < pos[0] and next_segment[1] > pos[1] or prev_segment[1] > pos[1] and next_segment[0] < pos[0]:  
+            elif prev_segment[0] < pos[0] and next_segment[1] > pos[1] or prev_segment[1] > pos[1] and next_segment[0] < pos[0]:
                 game_window.blit(body_textures['BOTTOMLEFT'], (pos[0], pos[1]))
-            elif prev_segment[0] > pos[0] and next_segment[1] > pos[1] or prev_segment[1] > pos[1] and next_segment[0] > pos[0]:  
+            elif prev_segment[0] > pos[0] and next_segment[1] > pos[1] or prev_segment[1] > pos[1] and next_segment[0] > pos[0]:
                 game_window.blit(body_textures['BOTTOMRIGHT'], (pos[0], pos[1]))
 
     game_window.blit(fruit_texture, (fruit_pos[0], fruit_pos[1]))
@@ -170,13 +183,15 @@ while True:
         game_over()
     if snake_pos[1] < 0 or snake_pos[1] > windheight - 10:
         game_over()
-    
-    for block in snake_body [1 : ] :
+
+    for block in snake_body[1:]:
         if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
             game_over()
-    
-    show_score (1, white, 'times new roman', 20)
+
+    show_score(1, white, 'times new roman', 20)
 
     pygame.display.update()
- 
     fps.tick(30)
+
+pygame.quit()
+quit()
