@@ -2,7 +2,7 @@ import pygame
 import time
 import random
 
-snake_velocity = 10
+snake_velocity = 30
 
 windwidth = 800
 windheight = 600
@@ -20,7 +20,7 @@ game_window = pygame.display.set_mode((windwidth, windheight))
 
 fps = pygame.time.Clock()
 
-snake_pos = [100, 100]
+snake_pos = [100.0, 100.0] 
 
 snake_body = [[100, 100], [90, 100], [80, 100]]
 
@@ -32,6 +32,7 @@ direction = 'RIGHT'
 change_to = direction
 
 score = 0
+growth_counter = 0
 
 def show_score(choice, color, font, size):
     score_font = pygame.font.SysFont(font, size)
@@ -53,7 +54,7 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            quit()
+            quit()  
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
@@ -84,9 +85,16 @@ while True:
         snake_pos[0] += 10
 
     snake_body.insert(0, list(snake_pos))
+    
+    
     if snake_pos[0] == fruit_pos[0] and snake_pos[1] == fruit_pos[1]:
         score += 10
         fruit_spawn = False
+        growth_counter += 5  
+
+    
+    if growth_counter > 0:
+        growth_counter -= 1
     else:
         snake_body.pop()
 
@@ -97,7 +105,7 @@ while True:
     game_window.fill(blue)
 
     for pos in snake_body:
-        pygame.draw.rect(game_window, green, pygame.Rect(pos[0], pos[1], 10, 10))
+        pygame.draw.circle(game_window, green, (round(pos[0]), round(pos[1])), 10)
     pygame.draw.rect(game_window, white, pygame.Rect(fruit_pos[0], fruit_pos[1], 10, 10))
 
     if snake_pos[0] < 0 or snake_pos[0] > windwidth - 10:
@@ -113,4 +121,5 @@ while True:
 
     pygame.display.update()
 
+    snake_velocity = 10 + (score // 10)  
     fps.tick(snake_velocity)
